@@ -81,7 +81,7 @@ def _main_():
         pbar = tqdm.tqdm(enumerate(map(''.join, itertools.product(lettersString, repeat=siteInfo["urlLength"]))), total=math.comb(len(lettersString), siteInfo["urlLength"]))
         try:    
             for index, string in pbar:
-                pbar.set_description("Current: "+str(string))
+                pbar.set_description("Current: "+str(string)+ " Index: "+ str(index))
 
                 # TODO: Split files into subfolders with max limit number of files. Suggest 1000 per folder.
                 ImgUrl = siteInfo["imageUrlPrefix"] + string + siteInfo["imageUrlAppended"]
