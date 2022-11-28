@@ -97,8 +97,8 @@ def _main_():
 
 def imageDownloader(ImgUrl, index):
 
-    # newFileLocation = imageSavePath+"\\"+str(index)+" - "+ImgUrl.split('/')[-1]
-    newFileLocation = imageSavePath+"\\"+ ImgUrl.split('/')[-1]
+    newFileLocation = imageSavePath+"\\"+str(index)+" - "+ImgUrl.split('/')[-1]
+    # newFileLocation = imageSavePath+"\\"+ ImgUrl.split('/')[-1]
 
     if glob.glob( r'%s' %(newFileLocation)):
         return
@@ -114,6 +114,10 @@ def imageDownloader(ImgUrl, index):
         if  e.winerror == 10055:
             print("\n")
             print("[WinError 10055] Too many connections at the same time. Trying again in 5 seconds.")
+            sleep(3)
+        if  e.winerror == 2:
+            print("\n")
+            print("[WinError 2] Can't find file. Delete last entry in LinksFile and try again.")
             sleep(3)
         else:
             print("Unknow error: " )
