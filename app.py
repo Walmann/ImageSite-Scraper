@@ -6,7 +6,7 @@ from time import sleep
 import json
 import urllib.request
 from os.path import exists
-from os import system
+import os
 import tqdm
 
 import argparse
@@ -26,11 +26,11 @@ long_options = ["site", "path"]
 
 
 PageToScrape = "imgur"  # Check siteInfo for what to write here.
-imageSavePath = "./download"
+imageSavePath = "./download/"
 
 
 LinksFile = "Links.json"
-if not exists("./"+LinksFile):
+if not os.path.exists("./"+LinksFile):
     print("No LinkFile found. Please create one and edit LinksFile in script.")
 
 
@@ -59,7 +59,7 @@ try:
     args = parser.parse_args()
 
     if args.path:
-        imageSavePath = args.path
+        imageSavePathArg = args.path
     if args.site:
         PageToScrape = args.site
 
@@ -70,9 +70,10 @@ except Exception as e:
 
 
 
-imageSavePath = imageSavePath+PageToScrape
+imageSavePath = imageSavePathArg+"\\"+PageToScrape
 
-
+global imageSavePathSplit
+imageSavePathSplit = ""
 def _main_():
     
     lettersString = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -83,7 +84,7 @@ def _main_():
             for index, string in pbar:
                 pbar.set_description("Current: "+str(string)+ " Index: "+ str(index))
 
-                # TODO: Split files into subfolders with max limit number of files. Suggest 1000 per folder.
+
                 ImgUrl = siteInfo["imageUrlPrefix"] + string + siteInfo["imageUrlAppended"]
 
                 # print("Stats: Current combination: "+ImgUrl, end="\r")
@@ -92,17 +93,34 @@ def _main_():
                     imageDownloader(ImgUrl, index)
                 # print("Stats: Current combination: "+ImgUrl+". Success: "+str(imageLinkSuccess)+" Fail: "+str(imageLinkFail), end="\r")
         except KeyboardInterrupt as e:
-            input("\nPress CTRL+C again to exit. Press enter to coninue.")
-            system("cls")
+            exit= ""
+            exit = input("\nDo you really want to quit? y/N ")
+            if exit == "y"[0].lower():
+                sys.exit()
+            else: 
+                os.system("cls")
 
 def imageDownloader(ImgUrl, index):
-
-    newFileLocation = imageSavePath+"\\"+str(index)+" - "+ImgUrl.split('/')[-1]
+    global imageSavePath
     # newFileLocation = imageSavePath+"\\"+ ImgUrl.split('/')[-1]
 
+
+    
+    #Split files into folders sortet by 1000 images.
+
+    if len(str(index)) <= 3:
+        imageSavePathSplit = imageSavePath+"\\"+str(0)
+        
+    if len(str(index)) >= 4:
+        imageSavePathSplit = imageSavePath+"\\"+str(index)[:-3]
+        
+    if not os.path.exists(imageSavePathSplit):
+        os.makedirs(imageSavePathSplit) #create dir names by index, where the last 3 digits are removed. 
+    
+    newFileLocation = imageSavePathSplit+"\\"+str(index)+" - "+ImgUrl.split('/')[-1]
+    
     if glob.glob( r'%s' %(newFileLocation)):
         return
-    
 
     try:
         if siteInfo["name"] == "Imgur":
@@ -183,7 +201,7 @@ def CheckPageExists(pageUrl, index):
     return False
 
 
-system("cls")
+os.system("cls")
 
 CheckedLinks = getCheckedLinks()
 _main_()
